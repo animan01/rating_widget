@@ -31,27 +31,3 @@ barrating:
       /libraries/jquery-bar-rating/dist/themes/fontawesome-stars-o.css: {}
       /libraries/jquery-bar-rating/dist/themes/bars-reversed.css: {}
       /libraries/jquery-bar-rating/dist/themes/bootstrap-stars.css: {}
-
-useful:
-  version: VERSION
-  js:
-    js/useful.js : {}
-  css:
-    theme:
-      css/useful.css: {}
-  dependencies:
-    - core/jquery
-    - core/drupal
-    - votingapi_rating/fontawesome
-
-like:
-  version: VERSION
-  js:
-    js/like.js : {}
-  css:
-    theme:
-      css/like.css: {}
-  dependencies:
-    - core/jquery
-    - core/drupal
-    - votingapi_rating/fontawesome
