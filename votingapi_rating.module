@@ -69,6 +69,7 @@ function votingapi_rating_entity_type_build(array &$entity_types) {
   foreach ($plugins as $plugin_id => $definition) {
     $entity_types['vote']->setFormClass('votingapi_' . $plugin_id, 'Drupal\votingapi_rating\Form\BaseRatingForm');
   }
+  $entity_types['vote']->setClass('Drupal\votingapi_rating\Entity\Vote');
 }
 
 /**
