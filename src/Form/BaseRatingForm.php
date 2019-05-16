@@ -4,6 +4,8 @@ namespace Drupal\votingapi_rating\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
+use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\node\Entity\Node;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -169,9 +171,9 @@ class BaseRatingForm extends ContentEntityForm {
     }
 
     $results = $this->votingapiResult->getResults($entity->getVotedEntityType(), $entity->getVotedEntityId());
-    if (isset($results[$entity->getEntityTypeId()][$result_function])) {
+    if (isset($results[$entity->bundle()][$result_function])) {
       $resultCache[$entity->getEntityTypeId()] = [
-        $entity->getVotedEntityId() => $results[$entity->getEntityTypeId()],
+        $entity->getVotedEntityId() => $results[$entity->bundle()],
       ];
       return $resultCache[$entity->getEntityTypeId()][$entity->getVotedEntityId()][$result_function];
     }
@@ -216,8 +218,40 @@ class BaseRatingForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    /**
+     * Drupal\votingapi_rating\Entity\Vote $entity
+     */
     $entity = $this->getEntity();
+    $test = $entity->getOriginalId();
+    $entities = $this->entity->referencedEntities();
     $plugin = $form_state->get('plugin');
+
+    foreach ($entities as $entity_object) {
+      if ($entity_object instanceof Node) {
+        $entity_node = $entity_object;
+      }
+    }
+
+    $entity_type = $entity_node->getEntityTypeId();
+    $bundle = $entity_node->bundle();
+
+    $field_name = $entity->get('field_name')->value;
+
+    $bundle_fields = \Drupal::getContainer()->get('entity_field.manager')->getFieldDefinitions($entity_type, $bundle);
+    /**
+     * Drupal\field\Entity\FieldConfig $field_definition
+     */
+    $field_definition = $bundle_fields[$field_name];
+    $vote_type_id = $field_definition->getSetting('vote_type');
+
+
+/*    $vote_type_storage = \Drupal::entityTypeManager()
+      ->getStorage('vote')
+      ->loadByProperties([
+        'bundle' => [$vote_type_id],
+      ]);*/
+
+
 
     if ($plugin->canVote($entity)) {
       return parent::save($form, $form_state);
