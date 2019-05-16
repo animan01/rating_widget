@@ -222,28 +222,17 @@ abstract class VotingApiWidgetBase extends PluginBase implements VotingApiWidget
    * Get results.
    */
   public function getResults($entity, $result_function = FALSE, $reset = FALSE) {
-    if ($reset) {
-      drupal_static_reset(__FUNCTION__);
-    }
+    // Reset drupal static cache.
     $resultCache = &drupal_static(__FUNCTION__);
+
     if (!$resultCache) {
       $resultCache = $this->votingapiResult->getResults($entity->getVotedEntityType(), $entity->getVotedEntityId());
     }
 
-    if ($result_function) {
-      if (!$resultCache[$entity->getEntityTypeId()][$entity->getVotedEntityId()][$result_function]) {
-        return [];
-      }
-      return $resultCache[$entity->getEntityTypeId()][$entity->getVotedEntityId()][$result_function];
+    if (!isset($resultCache[$entity->getEntityTypeId()][$entity->getVotedEntityId()])) {
+      return [];
     }
-
-    if (!$result_function) {
-      if (!isset($resultCache[$entity->getEntityTypeId()][$entity->getVotedEntityId()])) {
-        return [];
-      }
-      return $resultCache[$entity->getEntityTypeId()][$entity->getVotedEntityId()];
-    }
-    return [];
+    return $resultCache[$entity->getEntityTypeId()][$entity->getVotedEntityId()];
   }
 
   /**
