@@ -222,7 +222,6 @@ class BaseRatingForm extends ContentEntityForm {
      * Drupal\votingapi_rating\Entity\Vote $entity
      */
     $entity = $this->getEntity();
-    $test = $entity->getOriginalId();
     $entities = $this->entity->referencedEntities();
     $plugin = $form_state->get('plugin');
 
@@ -234,24 +233,21 @@ class BaseRatingForm extends ContentEntityForm {
 
     $entity_type = $entity_node->getEntityTypeId();
     $bundle = $entity_node->bundle();
-
     $field_name = $entity->get('field_name')->value;
-
     $bundle_fields = \Drupal::getContainer()->get('entity_field.manager')->getFieldDefinitions($entity_type, $bundle);
+
     /**
      * Drupal\field\Entity\FieldConfig $field_definition
      */
     $field_definition = $bundle_fields[$field_name];
     $vote_type_id = $field_definition->getSetting('vote_type');
 
+    $vote_type_storage = \Drupal::entityTypeManager()
+      ->getStorage('vote_type')
+      ->load($vote_type_id);
 
-/*    $vote_type_storage = \Drupal::entityTypeManager()
-      ->getStorage('vote')
-      ->loadByProperties([
-        'bundle' => [$vote_type_id],
-      ]);*/
-
-
+    $vote_value_type = $vote_type_storage->getValueType();
+    $entity->set('value_type', $vote_value_type);
 
     if ($plugin->canVote($entity)) {
       return parent::save($form, $form_state);
